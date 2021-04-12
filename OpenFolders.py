@@ -23,7 +23,15 @@ ui  = app.userInterface
 # https://forums.autodesk.com/t5/fusion-360-api-and-scripts/api-bug-cannot-click-menu-items-in-nested-dropdown/m-p/9669144#M10876
 nestedMenuBugFixed = False
 
-controls = []
+controls = {
+            'titles': [],
+            'ids': [],
+            'parentsIds': [],
+            'types': [],
+            'paths': [],
+            'separators': [],
+            'icons': []
+            }
 
 undocumentedControls = []
 
@@ -374,6 +382,59 @@ def createJsonFiles(customPathFile):
         json.dump(emptyControls, f, indent=2)
 
 
+def cleanUI():
+
+    solidScripts = ui.allToolbarPanels.itemById('SolidScriptsAddinsPanel')
+    cntrls = solidScripts.controls
+
+    separator = cntrls.itemById(thisAddinName + 'separator')
+    if separator:
+        separator.deleteMe()
+
+    cmdDefs = ui.commandDefinitions
+
+    for i in range(0, len(controls['titles'])):
+        cmdDef = cmdDefs.itemById(thisAddinName + controls['ids'][i])
+        if cmdDef:
+            cmdDef.deleteMe()
+
+    if not nestedMenuBugFixed:
+        for i in range(0, len(undocumentedControls['titles'])):
+            cmdDef = cmdDefs.itemById(thisAddinName + undocumentedControls['ids'][i])
+            if cmdDef:
+                cmdDef.deleteMe()
+
+    dropdownCntr = cntrls.itemById(thisAddinName + 'root' + 'Dropdown')
+    if dropdownCntr:
+        for i in range(0, len(controls['titles'])):
+            cntrl = dropdownCntr.controls.itemById(thisAddinName + controls['ids'][i])
+            if cntrl:
+                cntrl.isPromoted = False
+                cntrl.deleteMe()
+            if controls['separators'][i]:
+                cntrl = dropdownCntr.controls.itemById(thisAddinName + controls['ids'][i] + 'separator')
+                if cntrl:
+                    cntrl.isPromoted = False
+                    cntrl.deleteMe()
+
+        dropdownCntr.deleteMe()
+
+    if not nestedMenuBugFixed:
+        dropdownCntr = cntrls.itemById(thisAddinName + 'root' + 'Dropdown' + 'Undoc')
+        if dropdownCntr:
+            for i in range(0, len(undocumentedControls['titles'])):
+                cntrl = dropdownCntr.controls.itemById(thisAddinName + undocumentedControls['ids'][i])
+                if cntrl:
+                    cntrl.isPromoted = False
+                    cntrl.deleteMe()
+                if undocumentedControls['separators'][i]:
+                    cntrl = dropdownCntr.controls.itemById(thisAddinName + undocumentedControls['ids'][i] + 'separator')
+                    if cntrl:
+                        cntrl.isPromoted = False
+                        cntrl.deleteMe()
+
+            dropdownCntr.deleteMe()
+
 def run(context):
 
     try:
@@ -476,6 +537,7 @@ def run(context):
 
     except:
         if ui:
+            cleanUI()
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()), '{} v{}'.format(thisAddinTitle, thisAddinVersion))
 
 
@@ -483,56 +545,7 @@ def stop(context):
 
     try:
 
-        solidScripts = ui.allToolbarPanels.itemById('SolidScriptsAddinsPanel')
-        cntrls = solidScripts.controls
-
-        separator = cntrls.itemById(thisAddinName + 'separator')
-        if separator:
-            separator.deleteMe()
-
-        cmdDefs = ui.commandDefinitions
-
-        for i in range(0, len(controls['titles'])):
-            cmdDef = cmdDefs.itemById(thisAddinName + controls['ids'][i])
-            if cmdDef:
-                cmdDef.deleteMe()
-
-        if not nestedMenuBugFixed:
-            for i in range(0, len(undocumentedControls['titles'])):
-                cmdDef = cmdDefs.itemById(thisAddinName + undocumentedControls['ids'][i])
-                if cmdDef:
-                    cmdDef.deleteMe()
-
-        dropdownCntr = cntrls.itemById(thisAddinName + 'root' + 'Dropdown')
-        if dropdownCntr:
-            for i in range(0, len(controls['titles'])):
-                cntrl = dropdownCntr.controls.itemById(thisAddinName + controls['ids'][i])
-                if cntrl:
-                    cntrl.isPromoted = False
-                    cntrl.deleteMe()
-                if controls['separators'][i]:
-                    cntrl = dropdownCntr.controls.itemById(thisAddinName + controls['ids'][i] + 'separator')
-                    if cntrl:
-                        cntrl.isPromoted = False
-                        cntrl.deleteMe()
-
-            dropdownCntr.deleteMe()
-
-        if not nestedMenuBugFixed:
-            dropdownCntr = cntrls.itemById(thisAddinName + 'root' + 'Dropdown' + 'Undoc')
-            if dropdownCntr:
-                for i in range(0, len(undocumentedControls['titles'])):
-                    cntrl = dropdownCntr.controls.itemById(thisAddinName + undocumentedControls['ids'][i])
-                    if cntrl:
-                        cntrl.isPromoted = False
-                        cntrl.deleteMe()
-                    if undocumentedControls['separators'][i]:
-                        cntrl = dropdownCntr.controls.itemById(thisAddinName + undocumentedControls['ids'][i] + 'separator')
-                        if cntrl:
-                            cntrl.isPromoted = False
-                            cntrl.deleteMe()
-
-                dropdownCntr.deleteMe()
+        cleanUI()
 
     except:
         if ui:
