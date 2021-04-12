@@ -11,7 +11,7 @@ import re
 
 thisAddinName = 'OpenFolders'
 thisAddinTitle = 'Open Folders'
-thisAddinVersion = '0.2.0'
+thisAddinVersion = '0.3.0'
 thisAddinAuthor = 'Jerome Briot'
 thisAddinContact = 'jbtechlab@gmail.com'
 
@@ -33,7 +33,15 @@ controls = {
             'icons': []
             }
 
-undocumentedControls = []
+undocumentedControls = {
+            'titles': [],
+            'ids': [],
+            'parentsIds': [],
+            'types': [],
+            'paths': [],
+            'separators': [],
+            'icons': []
+            }
 
 handlers = []
 
