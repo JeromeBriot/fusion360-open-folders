@@ -5,6 +5,11 @@ Open folders in Windows Explorer or in MacOS Finder directly from the Fusion 360
 
 ![OpenFolders undocumented menu](./images/fusion-360-open-folders-03.png)
 
+## Version history
+
+- 0.2.0 (12 April 2021) - Fix a bug in "controls" dict initialization
+- 0.1.0 (02 April 2021) - First release
+
 ## Installation
 
 Download and install the **GitHub2Fusion360** add-in ([Windows](https://apps.autodesk.com/FUSION/fr/Detail/Index?id=789800822168335025&appLang=en&os=Win64) or [Mac](https://apps.autodesk.com/FUSION/fr/Detail/Index?id=789800822168335025&os=Mac&appLang=en)) available for free on the Autodesk App Store.

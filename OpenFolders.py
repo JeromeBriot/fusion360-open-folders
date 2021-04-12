@@ -11,7 +11,7 @@ import re
 
 thisAddinName = 'OpenFolders'
 thisAddinTitle = 'Open Folders'
-thisAddinVersion = '0.1.0'
+thisAddinVersion = '0.2.0'
 thisAddinAuthor = 'Jerome Briot'
 thisAddinContact = 'jbtechlab@gmail.com'
 
