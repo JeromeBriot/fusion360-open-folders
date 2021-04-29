@@ -6,7 +6,7 @@ Open folders in Windows Explorer or in MacOS Finder directly from the Fusion 360
 ![OpenFolders undocumented menu](./images/fusion-360-open-folders-03.png)
 
 ## Version history
-
+- 0.4.0 (29 April 2021) - Fix some bugs and add path to the Fusion 360 Python API folder
 - 0.3.0 (12 April 2021) - Fix a bug in "undocumentedControls" dict initialization
 - 0.2.0 (12 April 2021) - Fix a bug in "controls" dict initialization
 - 0.1.0 (02 April 2021) - First release
