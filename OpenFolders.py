@@ -11,7 +11,7 @@ import re
 
 thisAddinName = 'OpenFolders'
 thisAddinTitle = 'Open Folders'
-thisAddinVersion = '0.3.0'
+thisAddinVersion = '0.4.0'
 thisAddinAuthor = 'Jerome Briot'
 thisAddinContact = 'jbtechlab@gmail.com'
 
@@ -22,6 +22,8 @@ ui  = app.userInterface
 
 # https://forums.autodesk.com/t5/fusion-360-api-and-scripts/api-bug-cannot-click-menu-items-in-nested-dropdown/m-p/9669144#M10876
 nestedMenuBugFixed = False
+
+showUndocumentedFolders = True
 
 controls = {
             'titles': [],
@@ -45,6 +47,7 @@ undocumentedControls = {
 
 handlers = []
 
+
 def getDefaultControls():
 
     global controls
@@ -57,7 +60,8 @@ def getDefaultControls():
         directory = os.path.join(os.getenv('LOCALAPPDATA'), 'Autodesk', 'webdeploy', 'production')
         fusion360Install = max([os.path.join(directory,d) for d in os.listdir(directory)], key=os.path.getctime)
 
-        fusion360Cpp = os.path.join(fusion360Install, 'CPP')
+        fusion360ApiCpp = os.path.join(fusion360Install, 'CPP')
+        fusion360ApiPython = os.path.join(fusion360Install, 'Api', 'Python')
         fusion360Python = os.path.join(fusion360Install, 'Python')
 
         autodeskLocal = os.path.join(os.getenv('LOCALAPPDATA'), 'Autodesk')
@@ -68,6 +72,7 @@ def getDefaultControls():
                         'Install',
                         'API',
                         'C++',
+                        'Python',
                         'Python',
                         'Autodesk (Roaming)',
                         'Autodesk (Local)',
@@ -80,7 +85,8 @@ def getDefaultControls():
                     'ids': [
                         'Fusion360Install',
                         'Fusion360Api',
-                        'Fusion360Cpp',
+                        'Fusion360ApiCpp',
+                        'Fusion360ApiPython',
                         'Fusion360Python',
                         'AutodeskRoaming',
                         'AutodeskLocal',
@@ -101,6 +107,7 @@ def getDefaultControls():
                         'root',
                         'root',
                         'root',
+                        'root',
                         'root'
                     ],
                     'types': [
@@ -114,12 +121,14 @@ def getDefaultControls():
                         'command',
                         'command',
                         'command',
+                        'command',
                         'command'
                     ],
                     'paths': [
                         fusion360Install,
                         None,
-                        fusion360Cpp,
+                        fusion360ApiCpp,
+                        fusion360ApiPython,
                         fusion360Python,
                         autodeskRoaming,
                         autodeskLocal,
@@ -129,8 +138,9 @@ def getDefaultControls():
                         os.path.join(os.getenv('TMP')),
                         getUserDataPath()
                         ],
-                    'separators': [False, False, False, False, False, True, False, False, False, True, True],
+                    'separators': [False, False, False, False, True, False, True, False, False, False, True, True],
                     'icons': [
+                        'fusion360',
                         'fusion360',
                         'fusion360',
                         'fusion360',
@@ -144,8 +154,8 @@ def getDefaultControls():
                         ''
                     ]}
 
-        if not nestedMenuBugFixed:
-            controls['separators'][1] = True
+        # if not nestedMenuBugFixed:
+        #     controls['separators'][1] = True
 
     else:
 
@@ -159,7 +169,9 @@ def getDefaultControls():
 
         fusion360Install = os.path.join(fusionAppPath, 'Contents')
 
-        fusion360Cpp = os.path.join(fusion360Install, 'Libraries', 'Neutron', 'CPP')
+        fusion360ApiCpp = os.path.join(fusion360Install, 'Libraries', 'Neutron', 'CPP')
+        fusion360ApiPython = os.path.join(fusion360Install, 'Api', 'Python')
+
         fusion360Python = os.path.join(fusion360Install, 'Frameworks', 'Python.framework', 'Versions')
 
         controls = {
@@ -168,6 +180,7 @@ def getDefaultControls():
                         'API',
                         'C++',
                         'Python',
+                        'Python',
                         'Autodesk',
                         'Desktop',
                         'Preferences'
@@ -175,7 +188,8 @@ def getDefaultControls():
                     'ids': [
                         'Fusion360Install',
                         'Fusion360Api',
-                        'Fusion360Cpp',
+                        'Fusion360ApiCpp',
+                        'Fusion360ApiPython',
                         'Fusion360Python',
                         'Autodesk',
                         'Desktop',
@@ -188,6 +202,7 @@ def getDefaultControls():
                         'Fusion360Api',
                         'root',
                         'root',
+                        'root',
                         'root'
                     ],
                     'types': [
@@ -197,19 +212,22 @@ def getDefaultControls():
                         'command',
                         'command',
                         'command',
+                        'command',
                         'command'
                     ],
                     'paths': [
                         fusion360Install,
                         None,
-                        fusion360Cpp,
+                        fusion360ApiCpp,
+                        fusion360ApiPython,
                         fusion360Python,
                         autodeskPath,
                         desktopPath,
                         getUserDataPath()
                     ],
-                    'separators': [False, False, False, False, True, True, True],
+                    'separators': [False, False, False, False, True, True, True, True],
                     'icons': [
+                        'fusion360',
                         'fusion360',
                         'fusion360',
                         'fusion360',
@@ -220,8 +238,9 @@ def getDefaultControls():
                     ]
                     }
 
-        if not nestedMenuBugFixed:
-            controls['separators'][1] = True
+        # if not nestedMenuBugFixed:
+        #     controls['separators'][1] = True
+
 
 def getUndocumentedControls():
 
@@ -244,7 +263,7 @@ def getUndocumentedControls():
 
     if nestedMenuBugFixed:
         controls['titles'].insert(idx, 'Undocumented')
-        controls['ids'].insert(idx, thisAddinName + 'Undocumented')
+        controls['ids'].insert(idx, 'Undocumented')
         controls['parentsIds'].insert(idx, 'root')
         controls['types'].insert(idx, 'dropdown')
         controls['paths'].insert(idx, None)
@@ -271,15 +290,15 @@ def getUndocumentedControls():
             if nestedMenuBugFixed:
                 idx += 1
                 controls['titles'].insert(idx, pn)
-                controls['ids'].insert(idx, thisAddinName + pn.replace(' ', ''))
-                controls['parentsIds'].insert(idx, thisAddinName + 'Undocumented')
+                controls['ids'].insert(idx, pn.replace(' ', ''))
+                controls['parentsIds'].insert(idx, 'Undocumented')
                 controls['types'].insert(idx, 'command')
                 controls['paths'].insert(idx, pp)
                 controls['separators'].insert(idx, False)
                 controls['icons'].insert(idx, 'fusion360')
             else:
                 undocumentedControls['titles'].append(pn)
-                undocumentedControls['ids'].append(thisAddinName + pn.replace(' ', ''))
+                undocumentedControls['ids'].append(pn.replace(' ', ''))
                 undocumentedControls['parentsIds'].append('root')
                 undocumentedControls['types'].append('command')
                 undocumentedControls['paths'].append(pp)
@@ -332,14 +351,19 @@ class commandCreatedEventHandler(adsk.core.CommandCreatedEventHandler):
 
         try:
 
-            if args.firingEvent.sender.name in controls['titles']:
-                idx = controls['titles'].index(args.firingEvent.sender.name)
+            senderId = args.firingEvent.sender.id[len(thisAddinName):]
+
+            if senderId in controls['ids']:
+                idx = controls['ids'].index(senderId)
                 if controls['paths'][idx]:
                     path = os.path.realpath(controls['paths'][idx])
-            else:
-                idx = undocumentedControls['titles'].index(args.firingEvent.sender.name)
+            elif senderId in undocumentedControls['ids']:
+                idx = undocumentedControls['ids'].index(senderId)
                 if undocumentedControls['paths'][idx]:
                     path = os.path.realpath(undocumentedControls['paths'][idx])
+            else:
+                ui.messageBox('Control not in list', '{} v{}'.format(thisAddinTitle, thisAddinVersion), adsk.core.MessageBoxButtonTypes.OKButtonType, adsk.core.MessageBoxIconTypes.CriticalIconType)
+                path = None
 
             if path:
 
@@ -443,13 +467,14 @@ def cleanUI():
 
             dropdownCntr.deleteMe()
 
+
 def run(context):
 
     try:
 
         getDefaultControls()
 
-        if nestedMenuBugFixed:
+        if nestedMenuBugFixed and showUndocumentedFolders:
             getUndocumentedControls()
 
         getCustomControls()
@@ -499,7 +524,7 @@ def run(context):
             if controls['separators'][i]:
                 dropdown.controls.addSeparator(thisAddinName + controls['ids'][i] + 'separator', '')
 
-        if not nestedMenuBugFixed:
+        if not nestedMenuBugFixed and showUndocumentedFolders:
 
             getUndocumentedControls()
 
